@@ -42,6 +42,10 @@ public class Circle {
         return coords;
     }
 
+    public float[] getCenterCoords() {
+        return centerCoords;
+    }
+
     public short[] getVertexIndexes() {
         return VERTEX_INDEXES;
     }
