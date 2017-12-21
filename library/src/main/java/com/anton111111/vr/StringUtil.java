@@ -4,7 +4,15 @@ import java.util.Locale;
 
 public class StringUtil {
 
+    public static String formatMatrix(float[] matrix) {
+        return formatMatrix(matrix, 0);
+    }
+
     public static String formatMatrix(float[] matrix, int cols) {
+        if (matrix == null) {
+            return "null";
+        }
+
         String r = "[";
         int c = 0;
         for (int i = 0; i < matrix.length; i++) {
@@ -14,7 +22,7 @@ public class StringUtil {
             }
             c++;
             if (i != matrix.length - 1) {
-                r += (c == cols) ? "\n" : " ";
+                r += (c > 0 && c == cols) ? "\n" : " ";
                 if (c == cols) {
                     c = 0;
                 }
