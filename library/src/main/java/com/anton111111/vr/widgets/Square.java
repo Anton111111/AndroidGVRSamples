@@ -134,6 +134,6 @@ public class Square {
                 GLES20.GL_TRIANGLES, 6,
                 GLES20.GL_UNSIGNED_SHORT, verticesIndexesBuffer);
 
-        GLHelper.checkGLError("Square renderPanel");
+        GLHelper.checkGLError("Square render");
     }
 }

@@ -115,6 +115,6 @@ public class Circle {
                 GLES20.GL_TRIANGLES, 6,
                 GLES20.GL_UNSIGNED_SHORT, verticesIndexesBuffer);
 
-        GLHelper.checkGLError("Circle renderPanel");
+        GLHelper.checkGLError("Circle render");
     }
 }
