@@ -179,7 +179,7 @@ public class RayPickingSample extends GvrActivity
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
         GLES20.glDepthMask(true);
 
-        if (cursorX < 0 && cursorY < 0 && viewWidth > 0 && viewHeight > 0) {
+        if (eye.getType() <= 1 && cursorX < 0 && cursorY < 0 && viewWidth > 0 && viewHeight > 0) {
             int[] viewport = {0, 0, viewWidth, viewHeight};
             float[] coords = cursor.getCoords();
             float[] screenCoords = new float[3];
