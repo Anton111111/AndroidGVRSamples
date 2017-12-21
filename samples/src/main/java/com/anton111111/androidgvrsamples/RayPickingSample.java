@@ -10,6 +10,7 @@ import com.anton111111.vr.StringUtil;
 import com.anton111111.vr.program.ProgramHelper;
 import com.anton111111.vr.raypicking.RayPicking;
 import com.anton111111.vr.widgets.Square;
+import com.google.vr.sdk.base.AndroidCompat;
 import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.GvrActivity;
 import com.google.vr.sdk.base.GvrView;
@@ -68,6 +69,18 @@ public class RayPickingSample extends GvrActivity
         GvrView gvrView = findViewById(R.id.gvr_view);
         gvrView.setStereoModeEnabled(true);
         gvrView.setRenderer(this);
+        gvrView.setTransitionViewEnabled(true);
+
+        // Enable Cardboard-trigger feedback with Daydream headsets. This is a simple way of supporting
+        // Daydream controller input for basic interactions using the existing Cardboard trigger API.
+        gvrView.enableCardboardTriggerEmulation();
+
+        if (gvrView.setAsyncReprojectionEnabled(true)) {
+            // Async reprojection decouples the app framerate from the display framerate,
+            // allowing immersive interaction even at the throttled clockrates set by
+            // sustained performance mode.
+            AndroidCompat.setSustainedPerformanceMode(this, true);
+        }
         setGvrView(gvrView);
         statusView = findViewById(R.id.status);
         status2View = findViewById(R.id.status2);

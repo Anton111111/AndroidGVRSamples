@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.anton111111.vr.Quaternion;
 import com.anton111111.vr.program.ProgramHelper;
 import com.anton111111.vr.widgets.Square;
+import com.google.vr.sdk.base.AndroidCompat;
 import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.GvrActivity;
 import com.google.vr.sdk.base.GvrView;
@@ -98,8 +99,20 @@ public class RotationLimitSample extends GvrActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rotation_sample_activity);
         GvrView gv = findViewById(R.id.gvr_view);
-        setGvrView(gv);
         gv.setRenderer(this);
+        gv.setTransitionViewEnabled(true);
+
+        // Enable Cardboard-trigger feedback with Daydream headsets. This is a simple way of supporting
+        // Daydream controller input for basic interactions using the existing Cardboard trigger API.
+        gv.enableCardboardTriggerEmulation();
+
+        if (gv.setAsyncReprojectionEnabled(true)) {
+            // Async reprojection decouples the app framerate from the display framerate,
+            // allowing immersive interaction even at the throttled clockrates set by
+            // sustained performance mode.
+            AndroidCompat.setSustainedPerformanceMode(this, true);
+        }
+        setGvrView(gv);
         statusView = findViewById(R.id.status_text);
 
     }
