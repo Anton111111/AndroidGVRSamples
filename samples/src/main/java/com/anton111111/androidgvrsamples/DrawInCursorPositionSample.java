@@ -78,7 +78,7 @@ public class DrawInCursorPositionSample extends GvrActivity
         setContentView(R.layout.draw_in_cursor_position_sample_activity);
 
         GvrView gv = findViewById(R.id.gvr_view);
-        gv.setStereoModeEnabled(false);
+        gv.setStereoModeEnabled(true);
         gv.setRenderer(this);
         gv.setTransitionViewEnabled(true);
 
