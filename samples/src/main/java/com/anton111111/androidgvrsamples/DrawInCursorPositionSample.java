@@ -7,15 +7,12 @@ import android.opengl.GLU;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.util.Log;
+import android.widget.TextView;
 
 import com.anton111111.vr.Quaternion;
-import com.anton111111.vr.StringUtil;
 import com.anton111111.vr.program.ProgramHelper;
-import com.anton111111.vr.raypicking.RayPicking;
 import com.anton111111.vr.widgets.Axis;
 import com.anton111111.vr.widgets.Circle;
-import com.anton111111.vr.widgets.Line;
 import com.anton111111.vr.widgets.Square;
 import com.google.vr.sdk.base.AndroidCompat;
 import com.google.vr.sdk.base.Eye;
@@ -28,6 +25,7 @@ import com.google.vr.sdk.base.Viewport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -38,7 +36,7 @@ public class DrawInCursorPositionSample extends GvrActivity
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = 100.0f;
 
-    private static final float CURSOR_RADIUS = 0.06f;
+    private static final float CURSOR_RADIUS = 0.04f;
     private static final float CURSOR_THICKNESS = 0.015f;
     private static final float CURSOR_Z = -3.0f;
 
@@ -60,6 +58,7 @@ public class DrawInCursorPositionSample extends GvrActivity
     private float[] eulerAngles = new float[3];
     private float anglePitch = 0.0f;
     private float angleYaw = 0.0f;
+    private float angleRoll = 0.0f;
     private float eyeZ = 0.8f;
     private List<Square> squares = new ArrayList<>();
     private boolean isLocated = false;
@@ -70,6 +69,8 @@ public class DrawInCursorPositionSample extends GvrActivity
     private float cursorY = -1.0f;
     private Vibrator vibrator;
     private boolean isNeedAddSquare = false;
+    private Axis axis;
+    private TextView statusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,7 @@ public class DrawInCursorPositionSample extends GvrActivity
         setContentView(R.layout.draw_in_cursor_position_sample_activity);
 
         GvrView gv = findViewById(R.id.gvr_view);
+        gv.setStereoModeEnabled(false);
         gv.setRenderer(this);
         gv.setTransitionViewEnabled(true);
 
@@ -92,6 +94,7 @@ public class DrawInCursorPositionSample extends GvrActivity
         }
         setGvrView(gv);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        statusView = findViewById(R.id.status);
     }
 
     @Override
@@ -100,6 +103,16 @@ public class DrawInCursorPositionSample extends GvrActivity
         Quaternion.toEulerAngle(quaternion, eulerAngles);
         anglePitch = (float) Math.toDegrees(-eulerAngles[0]); // around X
         angleYaw = (float) Math.toDegrees(-eulerAngles[1]); // around Y
+        angleRoll = (float) Math.toDegrees(-eulerAngles[2]); // around Y
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                statusView.setText(String.format(Locale.getDefault(),
+                        "ViewPort: %dx%d\nangle pitch: %.2f\nangle yaw: %.2f\nangle roll: %.2f",
+                        viewWidth, viewHeight,
+                        anglePitch, angleYaw, angleRoll));
+            }
+        });
     }
 
     @Override
@@ -113,93 +126,53 @@ public class DrawInCursorPositionSample extends GvrActivity
         float[] modelViewMatrix = new float[16];
         float[] modelViewProjection = new float[16];
         Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.rotateM(modelMatrix, 0, angleYaw, 0.0f, 1.0f, 0.0f);
-        Matrix.rotateM(modelMatrix, 0, anglePitch, 1.0f, 0.0f, 0.0f);
+        Quaternion.toMatrix(modelMatrix, quaternion);
 
         Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
         Matrix.multiplyMM(modelViewProjection, 0, projectionMatrix, 0, modelViewMatrix, 0);
-        axis.render(modelViewProjection);
-        renderCursor(eye);
+
+
         if (isNeedAddSquare) {
-            addSquare(projectionMatrix);
+            addSquare();
         }
         for (Square square : squares) {
             square.render(modelViewProjection);
         }
+        axis.render(modelViewProjection);
+        renderCursor(eye);
     }
 
-    private void addSquare(float[] projectionMatrix) {
+    private void addSquare() {
         isNeedAddSquare = false;
         if (cursorX <= 0 || cursorY <= 0 || viewWidth <= 0 || viewHeight <= 0) {
             return;
         }
 
-        int[] viewport = {0, 0, viewWidth, viewHeight};
         int colorIndex = new Random().nextInt(COLORS.length / 4);
-        float width = new Random().nextFloat() * 0.1f + 0.1f; //from -0.4 to 0.4
-        float height = new Random().nextFloat() * 0.1f + 0.1f; //from -0.4 to 0.4
-        //float z = new Random().nextFloat() * 0.5f - 0.7f; //from -0.7 to -0.2
-        float z = -0.5f;
+        float width = new Random().nextFloat() * 0.1f + 0.1f; //from 0.1 to 0.2
+        float height = new Random().nextFloat() * 0.1f + 0.1f; //from 0.1 to 0.2
+        float depth = new Random().nextFloat() * 0.5f - 0.7f; //from -0.7 to -0.2
 
 
         float[] modelMatrix = new float[16];
         float[] out = new float[4];
-        float[] modelViewMatrix = new float[16];
+        float[] invQuaternion = new float[4];
+
         Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.rotateM(modelMatrix, 0, angleYaw, 0.0f, 1.0f, 0.0f);
-        Matrix.rotateM(modelMatrix, 0, anglePitch, 1.0f, 0.0f, 0.0f);
-        Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+        Quaternion.inverse(invQuaternion, quaternion);
+        Quaternion.toMatrix(modelMatrix, invQuaternion);
+        Matrix.multiplyMV(out, 0, modelMatrix, 0, new float[]{0.0f, 0.0f, depth, 1.0f}, 0);
+        out[0] = out[0] / out[3];
+        out[1] = out[1] / out[3];
+        out[2] = out[2] / out[3];
 
-        float[] intersect = RayPicking.rayPicking(viewWidth, viewHeight, cursorX, cursorY,
-                modelViewMatrix, projectionMatrix,
-                new float[]{
-                        -1f, -1f, z,
-                        1f, -1f, z,
-                        1f, 1f, z,
-                        -1f, 1f, z
-                },
-                new short[]{0, 1, 2, 0, 2, 3});
-        if (intersect == null) {
-            Log.e("Yo", "I: null");
-            return;
-        }
-        Log.e("Yo", "I: " + StringUtil.formatMatrix(intersect));
-
-//        Matrix.multiplyMV(out, 0, modelMatrix, 0,
-//                new float[]{cursor.getCenterCoords()[0], cursor.getCenterCoords()[1], cursor.getCenterCoords()[2], 1.0f}, 0);
-//        out[0] = out[0] / out[3];
-//        out[1] = out[1] / out[3];
-//        out[2] = out[2] / out[3];
-//        Log.e("Yo", "CW: " + StringUtil.formatMatrix(out));
-
-//        float[] win = new float[3];
-//        GLU.gluProject(out[0], out[1], out[2],
-//                modelViewMatrix, 0, projectionMatrix, 0,
-//                viewport, 0,
-//                win, 0);
-
-        //Log.e("Yo", "C: " + cursorX + "x" + cursorY);
-        //Log.e("Yo", "1: " + StringUtil.formatMatrix(win));
-
-        Square s = new Square(this, new float[]{intersect[0], intersect[1], intersect[2]}, Square.START_COORDS_TYPE_CENTER,
-                width, height);
+        Square s = new Square(this,
+                new float[]{out[0], out[1], out[2]}, Square.START_COORDS_TYPE_CENTER,
+                width, height,
+                invQuaternion
+        );
         s.setColor(Arrays.copyOfRange(COLORS, colorIndex * 4, (colorIndex + 1) * 4));
         squares.add(s);
-//
-//        float zn = ((Z_FAR + Z_NEAR) / (Z_FAR - Z_NEAR) + (1.0f / -zr) * ((-2.0f * Z_FAR * Z_NEAR) / (Z_FAR - Z_NEAR))) * 0.5f + 0.5f;
-//
-//
-//        GLU.gluUnProject(win[0], win[1], win[2],
-//                modelMatrix, 0, projectionMatrix, 0,
-//                viewport, 0,
-//                out, 0);
-//        out[0] = out[0] / out[3];
-//        out[1] = out[1] / out[3];
-//        out[2] = out[2] / out[3];
-//        Log.e("Yo", "2: " + z + " = " + StringUtil.formatMatrix(out));
-//
-
-
     }
 
 
@@ -217,6 +190,7 @@ public class DrawInCursorPositionSample extends GvrActivity
         float[] modelMatrix = new float[16];
         float[] modelViewMatrix = new float[16];
         float[] modelViewProjection = new float[16];
+
         Matrix.setIdentityM(modelMatrix, 0);
         Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
         Matrix.multiplyMM(modelViewProjection, 0, projectionMatrix, 0, modelViewMatrix, 0);
@@ -265,6 +239,8 @@ public class DrawInCursorPositionSample extends GvrActivity
                 }, CURSOR_RADIUS, CURSOR_THICKNESS);
 
         cursor.setColor(CURSOR_COLORS);
+
+        axis = new Axis(this);
 
     }
 
