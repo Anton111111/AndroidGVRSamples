@@ -46,6 +46,13 @@ public class Quaternion {
      * @param rhs        The float array that holds the right-hand-side quaternion.
      */
     public static void multiplyQQ(float[] quaternion, float[] lhs, float[] rhs) {
+        if (lhs.length != 4) {
+            throw new IllegalArgumentException("Wrong length of left hand quaternion");
+        }
+        if (rhs.length != 4) {
+            throw new IllegalArgumentException("Wrong length of right hand quaternion");
+        }
+
         if (quaternion.length < 16) {
             throw new IllegalArgumentException("Not enough space to write the result");
         }
@@ -67,6 +74,10 @@ public class Quaternion {
      * @param eulerAngles The float array that holds the result {pitch,yaw,roll}.
      */
     public static void toEulerAngle(float[] quaternion, float[] eulerAngles) {
+        if (quaternion.length != 4) {
+            throw new IllegalArgumentException("Wrong length of quaternion");
+        }
+
         if (eulerAngles == null) {
             eulerAngles = new float[3];
         } else if (eulerAngles.length != 3) {
@@ -105,6 +116,10 @@ public class Quaternion {
      * @param axis       the axis of rotation (already normalized).
      */
     public static void fromNormalAxisRadianAngle(float[] quaternion, float angle, float[] axis) {
+        if (quaternion.length != 4) {
+            throw new IllegalArgumentException("Wrong length of quaternion");
+        }
+
         if (axis[0] == 0 && axis[1] == 0 && axis[2] == 0) {
             quaternion[0] = 0.0f;
             quaternion[1] = 0.0f;
@@ -129,6 +144,10 @@ public class Quaternion {
      * @param axis       the axis of rotation (already normalized).
      */
     public static void fromNormalAxisDegreeAngle(float[] quaternion, float angle, float[] axis) {
+        if (quaternion.length != 4) {
+            throw new IllegalArgumentException("Wrong length of quaternion");
+        }
+
         fromNormalAxisRadianAngle(quaternion, (float) Math.toRadians(angle), axis);
     }
 
@@ -141,6 +160,9 @@ public class Quaternion {
      * @param roll       the Euler roll of rotation (in radians).
      */
     public static void fromEulerAngles(float[] quaternion, float pitch, float yaw, float roll) {
+        if (quaternion.length != 4) {
+            throw new IllegalArgumentException("Wrong length of quaternion");
+        }
         float angle;
         float sinYaw, sinRoll, sinPitch, cosYaw, cosRoll, cosPitch;
         angle = roll * 0.5f;
@@ -175,6 +197,12 @@ public class Quaternion {
      * @param quaternion
      */
     public static void inverse(float[] invQ, float[] quaternion) {
+        if (quaternion.length != 4) {
+            throw new IllegalArgumentException("Wrong length of quaternion");
+        }
+        if (invQ.length != 4) {
+            throw new IllegalArgumentException("Wrong length of invQ");
+        }
         float norm = norm(quaternion);
         if (norm > 0.0) {
             float invNorm = 1.0f / norm;
@@ -193,6 +221,9 @@ public class Quaternion {
      * @param quaternion The float array that holds the result.
      */
     public static void normalizeLocal(float[] quaternion) {
+        if (quaternion.length != 4) {
+            throw new IllegalArgumentException("Wrong length of quaternion");
+        }
         float n = (float) (1.0f / Math.sqrt(norm(quaternion)));
         quaternion[0] *= n;
         quaternion[1] *= n;
@@ -207,6 +238,9 @@ public class Quaternion {
      * @return the norm of the quaternion.
      */
     public static float norm(float[] quaternion) {
+        if (quaternion.length != 4) {
+            throw new IllegalArgumentException("Wrong length of quaternion");
+        }
         return quaternion[3] * quaternion[3] + quaternion[0] * quaternion[0] + quaternion[1] * quaternion[1] + quaternion[2] * quaternion[2];
     }
 
