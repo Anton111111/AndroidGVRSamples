@@ -8,10 +8,14 @@ Ray picking based on https://github.com/i-schuetz/Android_OpenGL_Picking and htt
 
 Ray picking sample
 ------------------
-Sample how to use ray picking
-
+Sample how to use ray picking/tracing
 
 Rotation limit sample
 ------------------
 Sample how to limit pitch and yaw rotation
+
+Draw in cursor position
+------------------
+Sample how to draw shape in cursor position
+
 
