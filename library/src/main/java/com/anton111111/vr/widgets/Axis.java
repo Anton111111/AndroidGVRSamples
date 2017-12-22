@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Axis {
 
+    private static final float FAR = 100.0f;
 
     private static final float COLOR_X[] = {
             0.0f, 1.0f, 0.0f, 1.0f
@@ -23,12 +24,12 @@ public class Axis {
     };
 
     private static final float COLOR_PLANE_Y[] = {
-            1.0f, 0.0f, 0.0f, 0.1f
+            1.0f, 0.0f, 0.0f, 0.15f
 
     };
 
     private static final float COLOR_PLANE_X[] = {
-            0.0f, 1.0f, 0.0f, 0.1f
+            0.0f, 1.0f, 0.0f, 0.15f
 
     };
 
@@ -43,30 +44,30 @@ public class Axis {
      */
     public Axis(Context context) {
         axisList.add(new Line(context, new float[]{
-                -1.0f, 0.0f, 0.0f,
-                1.0f, 0.0f, 0.0f,
+                -FAR, 0.0f, 0.0f,
+                FAR, 0.0f, 0.0f,
         }).setColor(COLOR_X));
         axisList.add(new Line(context, new float[]{
-                0.0f, -1.0f, 0.0f,
-                0.0f, 1.0f, 0.0f,
+                0.0f, -FAR, 0.0f,
+                0.0f, FAR, 0.0f,
         }).setColor(COLOR_Y));
         axisList.add(new Line(context, new float[]{
-                0.0f, 0.0f, -1.0f,
-                0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, -FAR,
+                0.0f, 0.0f, FAR,
         }).setColor(COLOR_Z));
 
         axisPlainsList.add(new Square(context, new float[]{
-                0.0f, -100.0f, 100.0f,
-                0.0f, -100.0f, -100.0f,
-                0.0f, 100.0f, -100.0f,
-                0.0f, 100.0f, 100.0f,
+                0.0f, -FAR, FAR,
+                0.0f, -FAR, -FAR,
+                0.0f, FAR, -FAR,
+                0.0f, FAR, FAR,
         }).setColor(COLOR_PLANE_Y));
 
         axisPlainsList.add(new Square(context, new float[]{
-                -1.0f, 0.0f, 1.0f,
-                1.0f, 0.0f, 1.0f,
-                1.0f, 0.0f, -1.0f,
-                -1.0f, 0.0f, -1.0f,
+                -FAR, 0.0f, FAR,
+                FAR, 0.0f, FAR,
+                FAR, 0.0f, -FAR,
+                -FAR, 0.0f, -FAR,
         }).setColor(COLOR_PLANE_X));
     }
 
