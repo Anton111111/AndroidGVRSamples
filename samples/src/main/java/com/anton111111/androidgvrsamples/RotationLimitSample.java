@@ -29,10 +29,10 @@ public class RotationLimitSample extends GvrActivity
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = 100.0f;
 
-    private static final float PITCH_LIMIT_MIN = -45f;
-    private static final float PITCH_LIMIT_MAX = 45f;
-    private static final float YAW_LIMIT_MIN = -45f;
-    private static final float YAW_LIMIT_MAX = 45f;
+    private static final float PITCH_LIMIT_MIN = -70f;
+    private static final float PITCH_LIMIT_MAX = 70f;
+    private static final float YAW_LIMIT_MIN = -70f;
+    private static final float YAW_LIMIT_MAX = 70f;
 
 
     private static final float[] COORDS = new float[]{
@@ -121,14 +121,18 @@ public class RotationLimitSample extends GvrActivity
     public void onNewFrame(HeadTransform headTransform) {
         headTransform.getQuaternion(quaternion, 0);
         Quaternion.toEulerAngle(quaternion, eulerAngles);
-        anglePitch = (float) Math.toDegrees(-eulerAngles[0]); // around X
-        angleYaw = (float) Math.toDegrees(-eulerAngles[1]); // around Y
+        anglePitch = (float) Math.toDegrees(eulerAngles[0]); // around X
+        angleYaw = (float) Math.toDegrees(eulerAngles[1]); // around Y
 
         angleYaw = (angleYaw < YAW_LIMIT_MIN) ? YAW_LIMIT_MIN : angleYaw;
         angleYaw = (angleYaw > YAW_LIMIT_MAX) ? YAW_LIMIT_MAX : angleYaw;
 
         anglePitch = (anglePitch < PITCH_LIMIT_MIN) ? PITCH_LIMIT_MIN : anglePitch;
         anglePitch = (anglePitch > PITCH_LIMIT_MAX) ? PITCH_LIMIT_MAX : anglePitch;
+
+        Quaternion.fromEulerAngles(quaternion, (float) Math.toRadians(anglePitch),
+                (float) Math.toRadians(angleYaw),
+                eulerAngles[2]);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -149,12 +153,10 @@ public class RotationLimitSample extends GvrActivity
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         float[] projectionMatrix = eye.getPerspective(Z_NEAR, Z_FAR);
         float[] modelMatrix = new float[16];
-        float[] view = new float[16];
         float[] modelViewMatrix = new float[16];
         float[] modelViewProjection = new float[16];
         Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.rotateM(modelMatrix, 0, angleYaw, 0.0f, 1.0f, 0.0f);
-        Matrix.rotateM(modelMatrix, 0, anglePitch, 1.0f, 0.0f, 0.0f);
+        Quaternion.toMatrix(modelMatrix, quaternion);
 
         Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
         Matrix.multiplyMM(modelViewProjection, 0, projectionMatrix, 0, modelViewMatrix, 0);

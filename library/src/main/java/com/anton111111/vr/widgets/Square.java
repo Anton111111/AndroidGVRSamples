@@ -1,51 +1,15 @@
 package com.anton111111.vr.widgets;
 
 import android.content.Context;
-import android.opengl.GLES20;
+import android.opengl.Matrix;
 
-import com.anton111111.vr.GLHelper;
-import com.anton111111.vr.program.Program;
-import com.anton111111.vr.program.ProgramHelper;
+import com.anton111111.vr.Quaternion;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-
-public class Square {
+public class Square extends ColoredShapeAbstract<Square> {
 
     public static final int START_COORDS_TYPE_CENTER = 1;
     public static final int START_COORDS_TYPE_LEFT_BOTTOM_CORNER = 2;
 
-
-    private static final short[] VERTEX_INDEXES = new short[]{
-            0, 1, 2, 0, 2, 3
-    };
-
-    private static final float COLOR[] = {
-            1.0f, 0.0f, 0.0f, 0.5f
-
-    };
-    private float width;
-    private float height;
-    private float[] coords;
-    private FloatBuffer verticesBuffer;
-    private ShortBuffer verticesIndexesBuffer;
-
-    private float[] color = COLOR;
-
-
-    public void setColor(float[] color) {
-        this.color = color;
-    }
-
-    public float[] getCoords() {
-        return coords;
-    }
-
-    public short[] getVertexIndexes() {
-        return VERTEX_INDEXES;
-    }
 
     /**
      * Create square
@@ -54,8 +18,6 @@ public class Square {
      * @param coords  coords of square vertices (left bottom, right bottom, right top, left top)
      */
     public Square(Context context, float[] coords) {
-        this.width = Math.abs(coords[0] - coords[3]);
-        this.height = Math.abs(coords[1] - coords[4]);
         this.coords = coords;
         init(context);
     }
@@ -82,9 +44,6 @@ public class Square {
      * @param height
      */
     public Square(Context context, float[] startCoords, int startCoordsType, float width, float height) {
-        this.width = width;
-        this.height = height;
-
         float lbx = startCoords[0];
         float lby = startCoords[1];
         if (startCoordsType == START_COORDS_TYPE_CENTER) {
@@ -100,40 +59,137 @@ public class Square {
         init(context);
     }
 
-    private void init(Context context) {
-        ByteBuffer bbcv = ByteBuffer.allocateDirect(coords.length * 4);
-        bbcv.order(ByteOrder.nativeOrder());
-        verticesBuffer = bbcv.asFloatBuffer();
-        verticesBuffer.put(coords);
-        verticesBuffer.position(0);
+    /**
+     * Create square
+     * (Do not recommend use it. Better use quaternions)
+     *
+     * @param context
+     * @param startCoords     coords of left bottom corner of square
+     * @param startCoordsType type of startCoords (START_COORDS_TYPE_CENTER, START_COORDS_TYPE_LEFT_BOTTOM_CORNER)
+     * @param width           width
+     * @param height          height
+     * @param pitch           the Euler pitch of rotation (in degree).
+     * @param yaw             the Euler yaw of rotation (in degree).
+     * @param roll            the Euler roll of rotation (in degree).
+     */
+    public Square(Context context, float[] startCoords, int startCoordsType,
+                  float width, float height,
+                  float pitch, float yaw, float roll) {
+        float lbx = startCoords[0];
+        float lby = startCoords[1];
+        if (startCoordsType == START_COORDS_TYPE_CENTER) {
+            lbx -= width / 2.0f;
+            lby -= height / 2.0f;
+        }
+        this.coords = new float[]{
+                lbx, lby, startCoords[2],
+                lbx + width, lby, startCoords[2],
+                lbx + width, lby + height, startCoords[2],
+                lbx, lby + height, startCoords[2],
+        };
+        setCenterCoords();
 
-        ByteBuffer bbSVIB = ByteBuffer.allocateDirect(VERTEX_INDEXES.length * 2);
-        bbSVIB.order(ByteOrder.nativeOrder());
-        verticesIndexesBuffer = bbSVIB.asShortBuffer();
-        verticesIndexesBuffer.put(VERTEX_INDEXES);
-        verticesIndexesBuffer.position(0);
 
-        ProgramHelper.initShapeColoredProgram(context);
+        float[] rotateM = new float[16];
+        Matrix.setIdentityM(rotateM, 0);
+        Matrix.translateM(rotateM, 0, centerCoords[0], centerCoords[1], centerCoords[2]);
+        Matrix.rotateM(rotateM, 0, pitch, 1.0f, 0.0f, 0.0f);
+        Matrix.rotateM(rotateM, 0, yaw, 0.0f, 1.0f, 0.0f);
+        Matrix.rotateM(rotateM, 0, roll, 0.0f, 0.0f, 1.0f);
+        Matrix.translateM(rotateM, 0, -centerCoords[0], -centerCoords[1], -centerCoords[2]);
+
+
+        float[] v0 = rotateVertex(new float[]{
+                lbx, lby, startCoords[2]
+        }, rotateM);
+        float[] v1 = rotateVertex(new float[]{
+                lbx + width, lby, startCoords[2]
+        }, rotateM);
+        float[] v2 = rotateVertex(new float[]{
+                lbx + width, lby + height, startCoords[2]
+        }, rotateM);
+        float[] v3 = rotateVertex(new float[]{
+                lbx, lby + height, startCoords[2],
+        }, rotateM);
+
+
+        this.coords = new float[]{
+                v0[0], v0[1], v0[2],
+                v1[0], v1[1], v1[2],
+                v2[0], v2[1], v2[2],
+                v3[0], v3[1], v3[2],
+        };
+
+        init(context);
     }
 
-    public void render(float[] modelViewProjection) {
-        Program program = ProgramHelper.getInstance().useProgram(ProgramHelper.PROGRAM_SHAPE_COLORED);
-        GLES20.glVertexAttribPointer(
-                program.getAttr(ProgramHelper.SHAPE_COLORED_ATTR_POSITION), 3,
-                GLES20.GL_FLOAT, false,
-                12, verticesBuffer);
 
-        GLES20.glUniform4fv(program.getUniform(ProgramHelper.SHAPE_COLORED_UNIFORM_COLOR),
-                1, color, 0);
+    /**
+     * Create square
+     *
+     * @param context
+     * @param startCoords     coords of left bottom corner of square
+     * @param startCoordsType type of startCoords (START_COORDS_TYPE_CENTER, START_COORDS_TYPE_LEFT_BOTTOM_CORNER)
+     * @param width
+     * @param height
+     * @param quaternion      quaternion to rotate square
+     */
+    public Square(Context context, float[] startCoords, int startCoordsType, float width, float height, float[] quaternion) {
+        float lbx = startCoords[0];
+        float lby = startCoords[1];
+        if (startCoordsType == START_COORDS_TYPE_CENTER) {
+            lbx -= width / 2.0f;
+            lby -= height / 2.0f;
+        }
+        this.coords = new float[]{
+                lbx, lby, startCoords[2],
+                lbx + width, lby, startCoords[2],
+                lbx + width, lby + height, startCoords[2],
+                lbx, lby + height, startCoords[2],
+        };
+        setCenterCoords();
 
-        GLES20.glUniformMatrix4fv(program.getUniform(ProgramHelper.SHAPE_COLORED_UNIFORM_MVP),
-                1, false, modelViewProjection, 0);
 
-        // Draw the square
-        GLES20.glDrawElements(
-                GLES20.GL_TRIANGLES, 6,
-                GLES20.GL_UNSIGNED_SHORT, verticesIndexesBuffer);
+        float[] rotateM = new float[16];
+        Matrix.setIdentityM(rotateM, 0);
+        Matrix.translateM(rotateM, 0, centerCoords[0], centerCoords[1], centerCoords[2]);
+        float[] qTM = new float[16];
+        Quaternion.toMatrix(qTM, quaternion);
+        Matrix.multiplyMM(rotateM, 0, rotateM, 0, qTM, 0);
+        Matrix.translateM(rotateM, 0, -centerCoords[0], -centerCoords[1], -centerCoords[2]);
 
-        GLHelper.checkGLError("Square render");
+        float[] v0 = rotateVertex(new float[]{
+                lbx, lby, startCoords[2]
+        }, rotateM);
+        float[] v1 = rotateVertex(new float[]{
+                lbx + width, lby, startCoords[2]
+        }, rotateM);
+        float[] v2 = rotateVertex(new float[]{
+                lbx + width, lby + height, startCoords[2]
+        }, rotateM);
+        float[] v3 = rotateVertex(new float[]{
+                lbx, lby + height, startCoords[2],
+        }, rotateM);
+
+
+        this.coords = new float[]{
+                v0[0], v0[1], v0[2],
+                v1[0], v1[1], v1[2],
+                v2[0], v2[1], v2[2],
+                v3[0], v3[1], v3[2],
+        };
+
+        init(context);
+    }
+
+    private float[] rotateVertex(float[] coords, float[] rotateM) {
+        float[] out = new float[4];
+        Matrix.multiplyMV(out, 0, rotateM, 0, new float[]{
+                coords[0], coords[1], coords[2], 1.0f
+        }, 0);
+        out[0] = out[0] / out[3];
+        out[1] = out[1] / out[3];
+        out[2] = out[2] / out[3];
+        return new float[]{out[0], out[1], out[2]};
     }
 }
