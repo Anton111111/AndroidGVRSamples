@@ -24,8 +24,9 @@ public class Line {
     private float[] color = COLOR;
 
 
-    public void setColor(float[] color) {
+    public Line setColor(float[] color) {
         this.color = color;
+        return this;
     }
 
     public float[] getCoords() {
