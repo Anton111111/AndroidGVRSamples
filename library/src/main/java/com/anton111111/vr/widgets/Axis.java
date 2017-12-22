@@ -35,7 +35,7 @@ public class Axis {
 
 
     private List<Line> axisList = new ArrayList<>();
-    private List<Square> axisPlainsList = new ArrayList<>();
+    private List<Square> axisPlanesList = new ArrayList<>();
 
     /**
      * Create axis
@@ -56,14 +56,14 @@ public class Axis {
                 0.0f, 0.0f, FAR,
         }).setColor(COLOR_Z));
 
-        axisPlainsList.add(new Square(context, new float[]{
+        axisPlanesList.add(new Square(context, new float[]{
                 0.0f, -FAR, FAR,
                 0.0f, -FAR, -FAR,
                 0.0f, FAR, -FAR,
                 0.0f, FAR, FAR,
         }).setColor(COLOR_PLANE_Y));
 
-        axisPlainsList.add(new Square(context, new float[]{
+        axisPlanesList.add(new Square(context, new float[]{
                 -FAR, 0.0f, FAR,
                 FAR, 0.0f, FAR,
                 FAR, 0.0f, -FAR,
@@ -76,7 +76,7 @@ public class Axis {
         for (Line axis : axisList) {
             axis.render(modelViewProjection);
         }
-        for (Square p : axisPlainsList) {
+        for (Square p : axisPlanesList) {
             p.render(modelViewProjection);
         }
     }
