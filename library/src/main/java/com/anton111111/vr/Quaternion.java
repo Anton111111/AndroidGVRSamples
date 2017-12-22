@@ -133,6 +133,41 @@ public class Quaternion {
     }
 
     /**
+     * set quaternion from the Euler angles
+     *
+     * @param quaternion The float array that holds the result.
+     * @param pitch      the Euler pitch of rotation (in radians).
+     * @param yaw        the Euler yaw of rotation (in radians).
+     * @param roll       the Euler roll of rotation (in radians).
+     */
+    public static void fromEulerAngles(float[] quaternion, float pitch, float yaw, float roll) {
+        float angle;
+        float sinYaw, sinRoll, sinPitch, cosYaw, cosRoll, cosPitch;
+        angle = roll * 0.5f;
+        sinRoll = (float) Math.sin(angle);
+        cosRoll = (float) Math.cos(angle);
+        angle = yaw * 0.5f;
+        sinYaw = (float) Math.sin(angle);
+        cosYaw = (float) Math.cos(angle);
+        angle = pitch * 0.5f;
+        sinPitch = (float) Math.sin(angle);
+        cosPitch = (float) Math.cos(angle);
+
+        // variables used to reduce multiplication calls.
+        float cosRollXcosPitch = cosYaw * cosRoll;
+        float sinRollXsinPitch = sinYaw * sinRoll;
+        float cosRollXsinPitch = cosYaw * sinRoll;
+        float sinRollXcosPitch = sinYaw * cosRoll;
+
+        quaternion[3] = (cosRollXcosPitch * cosPitch - sinRollXsinPitch * sinPitch);
+        quaternion[0] = (cosRollXcosPitch * sinPitch + sinRollXsinPitch * cosPitch);
+        quaternion[1] = (sinRollXcosPitch * cosPitch + cosRollXsinPitch * sinPitch);
+        quaternion[2] = (cosRollXsinPitch * cosPitch - sinRollXcosPitch * sinPitch);
+
+        normalizeLocal(quaternion);
+    }
+
+    /**
      * returns the inverse of this quaternion If this quaternion does not have an inverse (if its normal is
      * 0 or less), then null is returned.
      *
@@ -151,6 +186,20 @@ public class Quaternion {
         }
     }
 
+
+    /**
+     * normalizes the quaternion
+     *
+     * @param quaternion The float array that holds the result.
+     */
+    public static void normalizeLocal(float[] quaternion) {
+        float n = (float) (1.0f / Math.sqrt(norm(quaternion)));
+        quaternion[0] *= n;
+        quaternion[1] *= n;
+        quaternion[2] *= n;
+        quaternion[3] *= n;
+    }
+
     /**
      * returns the norm of quaternion. This is the dot
      * product of this quaternion with itself.
@@ -158,7 +207,7 @@ public class Quaternion {
      * @return the norm of the quaternion.
      */
     public static float norm(float[] quaternion) {
-        return quaternion[4] * quaternion[4] + quaternion[0] * quaternion[0] + quaternion[1] * quaternion[1] + quaternion[2] * quaternion[2];
+        return quaternion[3] * quaternion[3] + quaternion[0] * quaternion[0] + quaternion[1] * quaternion[1] + quaternion[2] * quaternion[2];
     }
 
 }
