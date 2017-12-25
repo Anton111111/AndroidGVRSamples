@@ -56,19 +56,19 @@ public class Axis {
                 0.0f, 0.0f, FAR,
         }).setColor(COLOR_Z));
 
-        axisPlanesList.add(new Square(context, new float[]{
-                0.0f, -FAR, FAR,
-                0.0f, -FAR, -FAR,
-                0.0f, FAR, -FAR,
-                0.0f, FAR, FAR,
-        }).setColor(COLOR_PLANE_Y));
-
-        axisPlanesList.add(new Square(context, new float[]{
-                -FAR, 0.0f, FAR,
-                FAR, 0.0f, FAR,
-                FAR, 0.0f, -FAR,
-                -FAR, 0.0f, -FAR,
-        }).setColor(COLOR_PLANE_X));
+//        axisPlanesList.add(new Square(context, new float[]{
+//                0.0f, -FAR, FAR,
+//                0.0f, -FAR, -FAR,
+//                0.0f, FAR, -FAR,
+//                0.0f, FAR, FAR,
+//        }).setColor(COLOR_PLANE_Y));
+//
+//        axisPlanesList.add(new Square(context, new float[]{
+//                -FAR, 0.0f, FAR,
+//                FAR, 0.0f, FAR,
+//                FAR, 0.0f, -FAR,
+//                -FAR, 0.0f, -FAR,
+//        }).setColor(COLOR_PLANE_X));
     }
 
 
