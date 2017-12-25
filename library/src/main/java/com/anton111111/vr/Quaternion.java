@@ -53,7 +53,7 @@ public class Quaternion {
             throw new IllegalArgumentException("Wrong length of right hand quaternion");
         }
 
-        if (quaternion.length < 16) {
+        if (quaternion.length < 4) {
             throw new IllegalArgumentException("Not enough space to write the result");
         }
 
