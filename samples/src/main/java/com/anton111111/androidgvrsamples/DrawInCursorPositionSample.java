@@ -61,12 +61,9 @@ public class DrawInCursorPositionSample extends GvrActivity
     private float angleRoll = 0.0f;
     private float eyeZ = 0.8f;
     private List<Square> squares = new ArrayList<>();
-    private boolean isLocated = false;
     private int viewWidth;
     private int viewHeight;
     private Circle cursor;
-    private float cursorX = -1.0f;
-    private float cursorY = -1.0f;
     private Vibrator vibrator;
     private boolean isNeedAddSquare = false;
     private Axis axis;
@@ -144,9 +141,6 @@ public class DrawInCursorPositionSample extends GvrActivity
 
     private void addSquare() {
         isNeedAddSquare = false;
-        if (cursorX <= 0 || cursorY <= 0 || viewWidth <= 0 || viewHeight <= 0) {
-            return;
-        }
 
         int colorIndex = new Random().nextInt(COLORS.length / 4);
         float width = new Random().nextFloat() * 0.1f + 0.1f; //from 0.1 to 0.2
@@ -197,20 +191,6 @@ public class DrawInCursorPositionSample extends GvrActivity
         cursor.render(modelViewProjection);
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
         GLES20.glDepthMask(true);
-
-        if (eye.getType() <= 1 && cursorX < 0 && cursorY < 0 && viewWidth > 0 && viewHeight > 0) {
-            int[] viewport = {0, 0, viewWidth, viewHeight};
-            float[] coords = cursor.getCoords();
-            float[] screenCoords = new float[3];
-            GLU.gluProject(coords[0], coords[1], coords[2],
-                    modelViewMatrix, 0,
-                    projectionMatrix, 0,
-                    viewport, 0,
-                    screenCoords, 0
-            );
-            cursorX = screenCoords[0];
-            cursorY = screenCoords[1];
-        }
     }
 
     @Override
