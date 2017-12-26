@@ -1,6 +1,22 @@
 package com.anton111111.vr;
 
+import android.opengl.Matrix;
+
 public class Quaternion {
+
+    /**
+     * Rotates matrix m to quaternion
+     *
+     * @param m          source matrix
+     * @param mOffset    index into m where the matrix starts
+     * @param quaternion Quaternion
+     */
+    public static void rotateM(float[] m, int mOffset, float[] quaternion) {
+        float[] sTemp = new float[32];
+        Quaternion.toMatrix(sTemp, quaternion);
+        Matrix.multiplyMM(sTemp, 16, m, mOffset, sTemp, 0);
+        System.arraycopy(sTemp, 16, m, mOffset, 16);
+    }
 
 
     /**
