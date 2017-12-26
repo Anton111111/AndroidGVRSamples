@@ -2,10 +2,8 @@ package com.anton111111.vr.widgets;
 
 import android.content.Context;
 import android.opengl.GLES20;
-import android.util.Log;
 
 import com.anton111111.vr.GLHelper;
-import com.anton111111.vr.StringUtil;
 import com.anton111111.vr.program.Program;
 import com.anton111111.vr.program.ProgramHelper;
 
@@ -27,10 +25,10 @@ public class Circle extends ColoredShapeAbstract<Circle> {
         this.thickness = thickness;
         this.radius = radius;
         this.coords = new float[]{
-                centerCoords[0] - radius, centerCoords[1], centerCoords[2] - radius,
-                centerCoords[0] + radius, centerCoords[1], centerCoords[2] - radius,
-                centerCoords[0] + radius, centerCoords[1], centerCoords[2] + radius,
-                centerCoords[0] - radius, centerCoords[1], centerCoords[2] + radius
+                centerCoords[0] - radius, centerCoords[1] - radius, centerCoords[2],
+                centerCoords[0] + radius, centerCoords[1] - radius, centerCoords[2],
+                centerCoords[0] + radius, centerCoords[1] + radius, centerCoords[2],
+                centerCoords[0] - radius, centerCoords[1] + radius, centerCoords[2]
         };
         init(context);
     }
