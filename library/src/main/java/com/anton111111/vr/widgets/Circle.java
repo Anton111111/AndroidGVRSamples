@@ -27,10 +27,10 @@ public class Circle extends ColoredShapeAbstract<Circle> {
         this.thickness = thickness;
         this.radius = radius;
         this.coords = new float[]{
-                centerCoords[0] - radius, centerCoords[1] - radius, centerCoords[2],
-                centerCoords[0] + radius, centerCoords[1] - radius, centerCoords[2],
-                centerCoords[0] + radius, centerCoords[1] + radius, centerCoords[2],
-                centerCoords[0] - radius, centerCoords[1] + radius, centerCoords[2]
+                centerCoords[0] - radius, centerCoords[1], centerCoords[2] - radius,
+                centerCoords[0] + radius, centerCoords[1], centerCoords[2] - radius,
+                centerCoords[0] + radius, centerCoords[1], centerCoords[2] + radius,
+                centerCoords[0] - radius, centerCoords[1], centerCoords[2] + radius
         };
         init(context);
     }

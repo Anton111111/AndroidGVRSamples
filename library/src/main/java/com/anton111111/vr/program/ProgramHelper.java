@@ -19,12 +19,17 @@ public class ProgramHelper {
 
     public static final String PROGRAM_SHAPE_TEXTURED = "PROGRAM_SHAPE_TEXTURED";
     public static final String PROGRAM_SHAPE_COLORED = "PROGRAM_SHAPE_COLORED";
+    public static final String PROGRAM_GRID_COLORED = "PROGRAM_GRID_COLORED";
     public static final String PROGRAM_CIRCLE_COLORED = "PROGRAM_CIRCLE_COLORED";
     public static final String PROGRAM_PROGRESS_CIRCLE = "PROGRAM_PROGRESS_CIRCLE";
 
     public static final String SHAPE_COLORED_ATTR_POSITION = "a_Position";
     public static final String SHAPE_COLORED_UNIFORM_MVP = "u_MVP";
     public static final String SHAPE_COLORED_UNIFORM_COLOR = "u_Color";
+
+    public static final String GRID_COLORED_ATTR_POSITION = "a_Position";
+    public static final String GRID_COLORED_UNIFORM_MVP = "u_MVP";
+    public static final String GRID_COLORED_UNIFORM_COLOR = "u_Color";
 
     public static final String CIRCLE_COLORED_ATTR_POSITION = "a_Position";
     public static final String CIRCLE_COLORED_UNIFORM_MVP = "u_MVP";
@@ -171,6 +176,20 @@ public class ProgramHelper {
                 new ArrayList<String>() {{
                     add(SHAPE_COLORED_UNIFORM_MVP);
                     add(SHAPE_COLORED_UNIFORM_COLOR);
+                }}
+        );
+    }
+
+    public static void initGridColoredProgram(Context context) {
+        ProgramHelper.getInstance().createProgram(context, ProgramHelper.PROGRAM_GRID_COLORED,
+                R.raw.grid_colored_vertex,
+                R.raw.grid_colored_fragment,
+                new ArrayList<String>() {{
+                    add(GRID_COLORED_ATTR_POSITION);
+                }},
+                new ArrayList<String>() {{
+                    add(GRID_COLORED_UNIFORM_MVP);
+                    add(GRID_COLORED_UNIFORM_COLOR);
                 }}
         );
     }

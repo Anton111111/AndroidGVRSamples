@@ -24,18 +24,18 @@ public class Axis {
     };
 
     private static final float COLOR_PLANE_Y[] = {
-            1.0f, 0.0f, 0.0f, 0.15f
+            1.0f, 0.0f, 0.0f, 0.3f
 
     };
 
     private static final float COLOR_PLANE_X[] = {
-            0.0f, 1.0f, 0.0f, 0.15f
+            0.0f, 1.0f, 0.0f, 0.3f
 
     };
 
 
     private List<Line> axisList = new ArrayList<>();
-    private List<Square> axisPlanesList = new ArrayList<>();
+    private List<Grid> axisPlanesList = new ArrayList<>();
 
     /**
      * Create axis
@@ -56,19 +56,19 @@ public class Axis {
                 0.0f, 0.0f, FAR,
         }).setColor(COLOR_Z));
 
-//        axisPlanesList.add(new Square(context, new float[]{
-//                0.0f, -FAR, FAR,
-//                0.0f, -FAR, -FAR,
-//                0.0f, FAR, -FAR,
-//                0.0f, FAR, FAR,
-//        }).setColor(COLOR_PLANE_Y));
-//
-//        axisPlanesList.add(new Square(context, new float[]{
-//                -FAR, 0.0f, FAR,
-//                FAR, 0.0f, FAR,
-//                FAR, 0.0f, -FAR,
-//                -FAR, 0.0f, -FAR,
-//        }).setColor(COLOR_PLANE_X));
+        axisPlanesList.add(new Grid(context, new float[]{
+                0.0f, -FAR, FAR,
+                0.0f, -FAR, -FAR,
+                0.0f, FAR, -FAR,
+                0.0f, FAR, FAR,
+        }).setColor(COLOR_PLANE_Y));
+
+        axisPlanesList.add(new Grid(context, new float[]{
+                -FAR, 0.0f, FAR,
+                FAR, 0.0f, FAR,
+                FAR, 0.0f, -FAR,
+                -FAR, 0.0f, -FAR,
+        }).setColor(COLOR_PLANE_X));
     }
 
 
